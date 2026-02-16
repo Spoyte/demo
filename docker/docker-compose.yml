@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  demo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+      - "3000:3000"
+    volumes:
+      - demo-data:/workspace/persistent
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DEMO_MODE=1
+      - SESSION_TIMEOUT=3600
+    restart: unless-stopped
+    networks:
+      - demo-network
+
+  # Optional: Redis for session management
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    networks:
+      - demo-network
+
+volumes:
+  demo-data:
+  redis-data:
+
+networks:
+  demo-network:
+    driver: bridge
